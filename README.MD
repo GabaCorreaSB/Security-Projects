@@ -5,9 +5,7 @@ Each project was created to deepen fundamental knowledge of security concepts an
 
 ## IDS
 
-Intrusion Detection System (IDS) Prototype
 
-A simple script made in python to check if any bots or hackers are trying to connect to the ssh on a linux server.
+A simple Python script designed to detect unauthorized attempts—such as those by bots or malicious actors—to access SSH on a Linux server.
 
-More info on how to configure e-mail step will be added further on.
-
+Additional instructions on configuring the email notification process will be provided in a future update.
