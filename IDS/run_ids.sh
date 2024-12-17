@@ -1,7 +1,7 @@
 #!/usr/bin/env bash
 
 #
-# Copyright (c) Gaba <gabriel.correasb@protonmail.com>
+# Copyright (c) 2024 Gaba <gabriel.correasb@protonmail.com>
 #
 
 MAIL_TO="admin@example.com"

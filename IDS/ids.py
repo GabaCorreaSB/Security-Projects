@@ -1,7 +1,7 @@
 #!/usr/bin/env python3
 
 #
-# Copyright (c) Gaba <gabriel.correasb@protonmail.com>
+# Copyright (c) 2024 Gaba <gabriel.correasb@protonmail.com>
 #
 
 import re
