@@ -36,9 +36,16 @@ async def scan_port(host: str, port: int, timeout: float = 2.0):
 		return port, False, (None, None), []
 
 def identify_service_vulns(banner: bytes):
+	"""
+	Try to identify the service and its version from the banner using regex
+	Return (service_name, version, vulns)
+	"""
 	pass
 
 def find_vulns(service_name, version):
+	"""
+	Check known vulnerabilites for the identified service and version
+	"""
 	pass
 
 async def scan_host(host: str, ports: list):
