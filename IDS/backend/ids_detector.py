@@ -7,6 +7,8 @@
 import re
 import datetime
 from collections import defaultdict
+from sqlalchemy.orm import Session
+from models import SessionLocal, SuspiciousAttempt
 import sys
 
 # Configuration vars
@@ -52,10 +54,10 @@ def detect_brute_force():
 					attempt_time = parse_log_time(month, day, time_str)
 					attempts_by_ip[ip].append(attempt_time)
 	except FileNotFoundError:
-		print(f"Log file {LOG_FILE} not found.")
-		sys.exit(1)
+		# Handle gracefully in production
+		pass
 
-	suspicious = []
+	suspicious_entries = []
 	for ip, times in attempts_by_ip.items():
 		# Sorting times here
 		times.sort()
@@ -64,21 +66,29 @@ def detect_brute_force():
 		for i in range(len(times)):
 			# Look ahead to see how many attempts fall in the last TIME_WINDOW seconds
 			c = 1
+			j_end = i
 			for j in range(i+1, len(times)):
 				if (times[j] - times[i]).total_seconds() <= TIME_WINDOW:
 					c += 1
+					j_end = j
 				else:
 					break
 			if c > FAILED_THRESHOLD:
-				suspicious.append((ip, c, times[i], times[j]))
+				suspicious_entries.append((ip, c, times[i], times[j_end]))
 
-	return suspicious
+	return suspicious_entries
 
-if __name__ == "__main__":
+def store_suspicious():
+	"""
+	Detect and store suspicious attempts in DB.
+	"""
 	suspicious = detect_brute_force()
-	if suspicious:
-		print("Suspicious activity detected:")
-		for (ip, count, start_time, end_time) in suspicious:
-			print(f"IP: {ip}, Attempts: {count}, Time Window: {start_time} to {end_time}")
-	else:
-		print("No suspicious activity found")
+	db: Session = SessionLocal()
+	for ip, count, start_time, end_time in suspicious:
+		# Check if entry already exists to avoid duplicates (simple approach)
+		exists = db.query(SuspiciousAttempt).filter_by(ip=ip, start_time=start_time, end_time=end_time).first()
+		if not exists:
+			attempt = SuspiciousAttempt(ip=ip, count=count, start_time=start_time, end_time=end_time)
+			db.add(attempt)
+	db.commit()
+	db.close()
